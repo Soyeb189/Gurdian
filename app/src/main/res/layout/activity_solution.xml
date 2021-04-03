@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ddd"
+    tools:context=".view.Solution">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:titleTextColor="@android:color/white"
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+        android:background="#558B2F"/>
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="7dp"
+        app:cardElevation="10dp"
+        android:id="@+id/cardPreparation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="রোগের বর্ণনা"
+                android:textSize="24sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:padding="5dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"
+                />
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:text="Lorem ipsum dolor sit amet, admodum oportere aliquando te ius, sed case appareat dignissim an, lorem vocibus necessitatibus ea mea. His atqui gloriatur referrentur an. Ad mei harum nobis omnesque, vis ex vide aliquip. Nec cu audiam minimum convenire, eam ad denique vulputate contentiones."
+                android:textAlignment="center"/>
+
+
+        </LinearLayout>
+
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="7dp"
+        app:cardElevation="10dp"
+        android:id="@+id/cardSolution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cardPreparation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="সমাধান"
+                android:textSize="24sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:padding="5dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"
+                />
+            <TextView
+                android:id="@+id/tvFertilizer"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:text="Lorem ipsum dolor sit amet, admodum oportere aliquando te ius, sed case appareat dignissim an, lorem vocibus necessitatibus ea mea. His atqui gloriatur referrentur an. Ad mei harum nobis omnesque, vis ex vide aliquip. Nec cu audiam minimum convenire, eam ad denique vulputate contentiones."
+                android:textAlignment="center"/>
+
+
+        </LinearLayout>
+
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+    <View
+        android:id="@+id/footerView"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#F13833"
+        android:layout_above="@+id/footer"/>
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:background="#fff"
+        android:layout_height="wrap_content">
+
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:text="Submit"
+            android:textColor="@android:color/white"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/bt_background_rounded_yellow"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

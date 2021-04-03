@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:title="Account"
+            android:id="@+id/account"
+            android:icon="@drawable/account"
+            android:iconTint="#558B2F"
+            />
+        <item
+            android:title="Help"
+            android:id="@+id/help"
+            android:icon="@drawable/help"
+            android:iconTint="#558B2F"
+            />
+        <item
+            android:title="About"
+            android:id="@+id/about"
+            android:icon="@drawable/about"
+            android:iconTint="#558B2F"
+            />
+
+    </group>
+</menu>
