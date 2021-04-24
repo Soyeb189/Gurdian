@@ -1,8 +1,10 @@
 package com.doctortree.doctortree.view
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.bd.ehaquesoft.sweetalert.SweetAlertDialog
 import com.doctortree.doctortree.R
@@ -44,14 +46,21 @@ class Registration : AppCompatActivity() {
     private lateinit var regViewModel : RegistrationViewM
 
     //*********** Global Variables **************//
-
     private lateinit var globalVeriable: GlobalVeriable
+
+    //****************** Text View ******************//
+    private lateinit var loginLink:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
 
         initialization()
+
+        loginLink.setOnClickListener {
+            var i = Intent(this,Login::class.java)
+            startActivity(i)
+        }
 
         buttonAcount.setOnClickListener {
             email = edtEmailReg.text.toString()
@@ -90,6 +99,9 @@ class Registration : AppCompatActivity() {
 
         //************ Global Variables **********//
         globalVeriable = this.applicationContext as GlobalVeriable
+
+        //************ Text View ***********//
+        loginLink = findViewById(R.id.loginLink)
 
 
     }
@@ -132,7 +144,15 @@ class Registration : AppCompatActivity() {
                         globalVeriable.name = model.name
                         globalVeriable.email = model.email
                         if (model.error?.equals(false)!!){
-                            Custom_alert.showSuccessMessage(this,"Registration Successful")
+                            SweetAlertDialog(this,SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("রেজিস্ট্রেশান সম্পূর্ণ হয়েছে")
+                                .setConfirmText("ওকে")
+                                .setConfirmClickListener {
+                                    val intent = Intent(this, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                .show()
                         }
                     }
 

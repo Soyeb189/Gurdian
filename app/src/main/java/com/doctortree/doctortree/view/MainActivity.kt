@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         Toast.makeText(this,JWTUtils.decoded(jwtString).toString(),Toast.LENGTH_SHORT).show()
 
         setSupportActionBar(toolbar)
-        supportActionBar?.title = "Tree Doctor"
+        supportActionBar?.title = "GARDIAN"
         //pDialog.show()
 
         //************ For Drawer *****************///
@@ -330,17 +330,17 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
 
         when(id){
             R.id.account ->{
-                i = Intent(this,Login::class.java)
+                i = Intent(this,Profile::class.java)
                 startActivity(i)
             }
 
             R.id.help ->{
-                i = Intent(this,Registration::class.java)
+                i = Intent(this,Messaging::class.java)
                 startActivity(i)
             }
 
             R.id.about ->{
-                i = Intent(this,Messaging::class.java)
+                i = Intent(this,About::class.java)
                 startActivity(i)
             }
 
