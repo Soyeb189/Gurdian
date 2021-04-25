@@ -8,6 +8,12 @@
             android:icon="@drawable/account"
             android:iconTint="#558B2F"
             />
+<!--        <item-->
+<!--            android:title="নতুন  অ্যাকাউন্ট খুলুন"-->
+<!--            android:id="@+id/reg"-->
+<!--            android:icon="@drawable/account"-->
+<!--            android:iconTint="#558B2F"-->
+<!--            />-->
         <item
             android:title="জিজ্ঞাসা"
             android:id="@+id/help"
