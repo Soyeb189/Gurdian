@@ -68,7 +68,7 @@ class Dieses : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
         initialization()
 
         setSupportActionBar(toolbar)
-        supportActionBar?.title = "Diseases "
+        supportActionBar?.title = "রোগসমূহ"
 
         //Toast.makeText(this,globalVeriable.id + globalVeriable.name + globalVeriable.email , Toast.LENGTH_SHORT).show()
 
@@ -303,15 +303,26 @@ class Dieses : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
     //***************** Adapter Class end here *********************//
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
         var id : Int = item.itemId
+        var i : Intent
 
         when(id){
-            R.id.account ->
-                Toast.makeText(this,"Account",Toast.LENGTH_SHORT).show()
-            R.id.help ->
-                Toast.makeText(this,"Help",Toast.LENGTH_SHORT).show()
-            R.id.about ->
-                Toast.makeText(this,"About",Toast.LENGTH_SHORT).show()
+            R.id.account ->{
+                i = Intent(this,Profile::class.java)
+                startActivity(i)
+            }
+
+            R.id.help ->{
+                i = Intent(this,Messaging::class.java)
+                startActivity(i)
+            }
+
+            R.id.about ->{
+                i = Intent(this,About::class.java)
+                startActivity(i)
+            }
+
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true

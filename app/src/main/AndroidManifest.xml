@@ -3,6 +3,8 @@
     package="com.doctortree.doctortree">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -14,8 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DoctorTree"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.Messaging"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".view.Profile"></activity>
+        <activity android:name=".view.About" />
+        <activity
+            android:name=".view.Messaging"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".view.Login" />
         <activity android:name=".view.Registration" /> <!-- <intent-filter> -->
         <!-- <action android:name="android.intent.action.MAIN" /> -->

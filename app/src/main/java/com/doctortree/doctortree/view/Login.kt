@@ -14,6 +14,7 @@ import com.doctortree.doctortree.request.LoginRequestM
 import com.doctortree.doctortree.request.RegistrationRequestM
 import com.doctortree.doctortree.util.Custom_alert
 import com.doctortree.doctortree.util.GlobalVeriable
+import com.doctortree.doctortree.util.PermissionUtil
 import com.doctortree.doctortree.viewModel.LoginViewM
 import com.google.android.material.textfield.TextInputEditText
 
@@ -37,6 +38,10 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         initialization()
+
+        try {
+            PermissionUtil.checkPermission(this, this)
+        }catch (e:Exception){}
 
         btnLogin.setOnClickListener {
             doLogin()

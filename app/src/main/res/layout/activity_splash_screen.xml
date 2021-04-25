@@ -30,6 +30,7 @@
         android:orientation="vertical"
         android:layout_weight="3.5" >
         <TextView
+            android:visibility="gone"
             android:layout_gravity="center"
             android:textAlignment="center"
             android:text="Welcome to"
@@ -41,7 +42,7 @@
         <TextView
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:text="Doctor Tree"
+            android:text="GARDIAN"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.AppCompat.Display2"
             android:textColor="@android:color/white"

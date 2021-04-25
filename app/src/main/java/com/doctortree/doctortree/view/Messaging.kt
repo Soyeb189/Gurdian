@@ -1,17 +1,18 @@
 package com.doctortree.doctortree.view
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.ViewModelProvider
@@ -23,10 +24,32 @@ import com.doctortree.doctortree.R
 import com.doctortree.doctortree.data.DiesesListDataM
 import com.doctortree.doctortree.data.MessageListDataM
 import com.doctortree.doctortree.request.MessageListRequestM
+import com.doctortree.doctortree.util.FileSizeRestriction
 import com.doctortree.doctortree.util.GlobalVeriable
 import com.doctortree.doctortree.viewModel.MessageListViewM
+import droidninja.filepicker.FilePickerBuilder
+import droidninja.filepicker.FilePickerConst
+import droidninja.filepicker.utils.ContentUriUtils
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
+import java.net.URISyntaxException
 
-class Messaging : AppCompatActivity() {
+class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
+
+    companion object {
+        const val RC_PHOTO_PICKER_PERM = 123
+        const val RC_FILE_PICKER_PERM = 321
+    }
+
+    private val MAX_ATTACHMENT_COUNT = 1
+    private var photoPaths = java.util.ArrayList<Uri>()
+    private var docPaths = java.util.ArrayList<Uri>()
+
+    private var filePaths =
+        java.util.ArrayList<Uri>()
+
+    var files = arrayOfNulls<Uri>(6)//emptyArray<Uri>()
 
     private lateinit var messageListViewM : MessageListViewM
     private lateinit var messageList : ArrayList<MessageListDataM>
@@ -41,6 +64,12 @@ class Messaging : AppCompatActivity() {
     //*********** Toolbar ************//
     private lateinit var toolbar: Toolbar
 
+    //********** Buttons *****************//
+    private lateinit var btnMessageImage : ImageView
+
+    var choose:Int = 0
+    var pDocNid:Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messaging)
@@ -48,12 +77,125 @@ class Messaging : AppCompatActivity() {
         initialization()
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.title = "Apanr jiggasha "
+        supportActionBar?.title = "জরুরি জিজ্ঞাসা"
+
+        btnMessageImage.setOnClickListener{
+            chooseFileType("Choose Photo")
+            choose = pDocNid
+        }
 
         getMessage()
        // observeMessage()
         observeViewModel()
     }
+
+
+    //*************** File Chooser ********************//
+
+    private fun chooseFileType(title: String) {
+        val dialog = Dialog(CreditCardRequestActivity@this)
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.choose_upload_type_view)
+        dialog.setTitle("Choose Document Type..")
+        var buttonCancle: Button
+        var dTitle:TextView
+        dTitle = dialog.findViewById(R.id.dialogTitle)
+        dTitle.text = title
+        buttonCancle = dialog.findViewById(R.id.btnCancel)
+        val pic = dialog.findViewById(R.id.lo_pic) as LinearLayout
+        pic.setOnClickListener {
+            pickPhotoClicked()
+            dialog.dismiss()
+        }
+        buttonCancle.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    @AfterPermissionGranted(Messaging.RC_PHOTO_PICKER_PERM)
+    fun pickPhotoClicked() {
+        if (EasyPermissions.hasPermissions(this, FilePickerConst.PERMISSIONS_FILE_PICKER)) {
+            onPickPhoto()
+        } else {
+            // Ask for one permission
+            EasyPermissions.requestPermissions(
+                this,
+                getString(R.string.rationale_photo_picker),
+                Messaging.RC_PHOTO_PICKER_PERM,
+                FilePickerConst.PERMISSIONS_FILE_PICKER
+            )
+        }
+    }
+
+    fun onPickPhoto() {
+        /*val maxCount: Int = MAX_ATTACHMENT_COUNT - docPaths.size
+        if (docPaths.size + photoPaths.size == MAX_ATTACHMENT_COUNT) {
+            Toast.makeText(
+                this, "Cannot select more than $MAX_ATTACHMENT_COUNT items",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {*/
+        FilePickerBuilder.instance
+            //.setMaxCount(maxCount)
+            .setMaxCount(1)
+            .setSelectedFiles(photoPaths) //this is optional
+            .setActivityTheme(R.style.FilePickerTheme)
+            .setActivityTitle("Please select media")
+            .enableVideoPicker(true)
+            .enableCameraSupport(true)
+            .showGifs(true)
+            .showFolderView(true)
+            .enableSelectAll(false)
+            .enableImagePicker(true)
+            .setCameraPlaceholder(R.drawable.custom_camera)
+            .withOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+            .pickPhoto(this, FilePickerConst.REQUEST_CODE_PHOTO)
+        // }
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.e("onActivityResult", "Action in OnActivity- Request Code: $requestCode")
+        when (requestCode) {
+            FilePickerConst.REQUEST_CODE_PHOTO -> if (resultCode == Activity.RESULT_OK && data != null) {
+                val dataList =
+                    data.getParcelableArrayListExtra<Uri>(FilePickerConst.KEY_SELECTED_MEDIA)
+                if (dataList != null) {
+                    photoPaths = java.util.ArrayList()
+                    photoPaths.addAll(dataList)
+                    try {
+                        //singleFileUpload(dataList.get(0));
+                        //multipleFileUpload(dataList)
+                        var res: Boolean =
+                            FileSizeRestriction.isValidFileSize("" + ContentUriUtils.getFilePath(
+                                this,
+                                dataList[0]))
+                        if (res) {
+                            files[choose] = dataList[0]
+                            //setImage(dataList[0])
+                            Log.e("onActivityResult", "" + files[choose])
+                        } else {
+                            FileSizeRestriction.showDocSizeError(this)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("onActivityResult", "" + e.toString())
+                    } catch (e: URISyntaxException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+        //addThemToView(photoPaths, docPaths)
+    }
+
+    //*************** File Chooser ********************//
+
 
     private fun getMessage() {
         val model = MessageListRequestM()
@@ -214,6 +356,8 @@ class Messaging : AppCompatActivity() {
 
         globalVeriable = this.applicationContext as GlobalVeriable
 
+        btnMessageImage = findViewById(R.id.btnMessageImage)
+
     }
 
     //***************** Adapter Class start here *********************//
@@ -336,6 +480,24 @@ class Messaging : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        TODO("Not yet implemented")
     }
 
     //***************** Adapter Class end here *********************//
