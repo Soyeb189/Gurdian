@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -21,6 +22,10 @@ class Profile : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListe
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     lateinit var toggle: ActionBarDrawerToggle
+
+    //*********** Text View **************//
+    private lateinit var tvName : TextView
+    private lateinit var tvEmail : TextView
 
 
     private lateinit var globalVeriable: GlobalVeriable
@@ -44,6 +49,10 @@ class Profile : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListe
         toggle.syncState()
 
         navigationView.setNavigationItemSelectedListener(this)
+
+
+        tvName.setText(globalVeriable.name)
+        tvEmail.setText(globalVeriable.email)
     }
 
     private fun initialization(){
@@ -53,6 +62,10 @@ class Profile : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListe
         //************ Drawer ****************//
         drawerLayout = findViewById(R.id.drawerLayout)
         navigationView = findViewById(R.id.navigationView)
+
+        //*********** Text View **************//
+        tvName  = findViewById(R.id.tvName)
+        tvEmail = findViewById(R.id.tvEmail)
 
         globalVeriable = this.applicationContext as GlobalVeriable
 
