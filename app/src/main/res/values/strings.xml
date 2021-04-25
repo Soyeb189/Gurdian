@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DoctorTree</string>
+    <string name="app_name">GARDIAN</string>
     <string name="open_drawer">Open Navigation Drawer</string>
     <string name="close_drawer">Close Navigation Drawer</string>
     <string name="underline_login"><u>আপনার অ্যাকাউন্ট নেই? <br /> রেজিস্ট্রেশান করুন</u></string>
