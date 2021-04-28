@@ -2,6 +2,7 @@ package com.doctortree.doctortree.retrofit
 
 import com.doctortree.doctortree.data.*
 import io.reactivex.Single
+import okhttp3.MultipartBody
 import retrofit2.http.*
 
 interface Api {
@@ -44,5 +45,15 @@ interface Api {
         @Path("sender_id") sender_id:String?
 
     ): Single<List<MessageListDataM>>
+
+    @Multipart
+    @POST("message")
+    fun doLrDocUpload(
+        @Part("sender_id") sender_id: String?,
+        @Part("receiver_id") receiver_id: String?,
+        @Part("message") message: String?,
+       // @Part image: List<MultipartBody.Part?>?
+    ): Single<MessageDataM>
+
 
 }

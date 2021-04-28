@@ -85,8 +85,8 @@ class Dieses : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
         id = intent.getStringExtra("id").toString()
         type = intent.getStringExtra("type").toString()
 
-        Toast.makeText(this, id, Toast.LENGTH_SHORT).show()
-        Toast.makeText(this, type, Toast.LENGTH_SHORT).show()
+       // Toast.makeText(this, id, Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, type, Toast.LENGTH_SHORT).show()
 
         doDailyTransactionNoTransfer()
         dailyTransferTransactionListObserver()

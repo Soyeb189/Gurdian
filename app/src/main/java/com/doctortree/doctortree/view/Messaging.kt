@@ -22,17 +22,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.doctortree.doctortree.R
 import com.doctortree.doctortree.data.DiesesListDataM
+import com.doctortree.doctortree.data.MessageDataM
 import com.doctortree.doctortree.data.MessageListDataM
 import com.doctortree.doctortree.request.MessageListRequestM
+import com.doctortree.doctortree.request.MessageRequestM
+import com.doctortree.doctortree.util.Custom_alert
+import com.doctortree.doctortree.util.Custom_alert.showSuccessMessage
 import com.doctortree.doctortree.util.FileSizeRestriction
 import com.doctortree.doctortree.util.GlobalVeriable
+import com.doctortree.doctortree.util.ImageUtil
 import com.doctortree.doctortree.viewModel.MessageListViewM
+import com.doctortree.doctortree.viewModel.MessageVM
 import droidninja.filepicker.FilePickerBuilder
 import droidninja.filepicker.FilePickerConst
 import droidninja.filepicker.utils.ContentUriUtils
+import kotlinx.android.synthetic.main.activity_messaging.*
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import java.io.File
 import java.net.URISyntaxException
 
 class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
@@ -70,6 +81,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     var choose:Int = 0
     var pDocNid:Int = 0
 
+    private lateinit var messageVM: MessageVM
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messaging)
@@ -84,9 +97,14 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             choose = pDocNid
         }
 
+        sendImage.setOnClickListener {
+            updateDocuments("1")
+        }
+
         getMessage()
        // observeMessage()
         observeViewModel()
+        observeMessageImage()
     }
 
 
@@ -117,6 +135,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     @AfterPermissionGranted(Messaging.RC_PHOTO_PICKER_PERM)
     fun pickPhotoClicked() {
         if (EasyPermissions.hasPermissions(this, FilePickerConst.PERMISSIONS_FILE_PICKER)) {
+            Log.e("enter","true1")
             onPickPhoto()
         } else {
             // Ask for one permission
@@ -130,6 +149,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     }
 
     fun onPickPhoto() {
+        Log.e("enter","true2")
         /*val maxCount: Int = MAX_ATTACHMENT_COUNT - docPaths.size
         if (docPaths.size + photoPaths.size == MAX_ATTACHMENT_COUNT) {
             Toast.makeText(
@@ -168,7 +188,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                     data.getParcelableArrayListExtra<Uri>(FilePickerConst.KEY_SELECTED_MEDIA)
                 if (dataList != null) {
                     photoPaths = java.util.ArrayList()
-                    photoPaths.addAll(dataList)
+                    photoPaths.add(dataList[0])
                     try {
                         //singleFileUpload(dataList.get(0));
                         //multipleFileUpload(dataList)
@@ -178,8 +198,10 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                                 dataList[0]))
                         if (res) {
                             files[choose] = dataList[0]
-                            //setImage(dataList[0])
+                            setImage(dataList[0])
+
                             Log.e("onActivityResult", "" + files[choose])
+                            Log.e("onActivityResultSize", "" + files.size.toString())
                         } else {
                             FileSizeRestriction.showDocSizeError(this)
                         }
@@ -192,6 +214,33 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             }
         }
         //addThemToView(photoPaths, docPaths)
+    }
+
+    fun setImage(path: Uri){
+        var imageView: ImageView = findViewById(R.id.imageMsg)
+
+
+        //pDocNid,pDocForm,pDocTin,pDocCert,pDocSTMT,pDocBusinessCard
+        if(choose == pDocNid){
+            imageView = findViewById(R.id.imageMsg)
+        }
+
+        try {
+
+            ImageUtil.glidLoadUri(this, imageView, path)
+            ImageUtil.loadUri(this, imageView,path)
+            /*Glide.with(this)
+                .load(path)
+                .apply(
+                    RequestOptions.centerCropTransform()
+                        .dontAnimate()
+                        //.override(imageSize, imageSize)
+                        .placeholder(droidninja.filepicker.R.drawable.image_placeholder)
+                )
+                .thumbnail(0.5f)
+                .into(imageView)*/
+        }catch (e:Exception){}
+
     }
 
     //*************** File Chooser ********************//
@@ -358,6 +407,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         btnMessageImage = findViewById(R.id.btnMessageImage)
 
+        messageVM = ViewModelProvider(this).get(MessageVM::class.java)
+
     }
 
     //***************** Adapter Class start here *********************//
@@ -501,4 +552,85 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     }
 
     //***************** Adapter Class end here *********************//
+
+
+    //***************** Submit ************************//
+    fun updateDocuments(reqid: String) {
+
+        val parts: MutableList<MultipartBody.Part> =
+            java.util.ArrayList()
+
+        var index: Int = 0
+
+        for (uri in photoPaths) {
+            val path = ContentUriUtils.getFilePath(this, uri!!)
+            Log.e("Upload", "Path: " + path)
+            val file = File(path)
+
+            // create RequestBody instance from file
+            val requestFile = RequestBody.create(
+                MediaType.parse(contentResolver.getType(uri)),
+                file
+            )
+
+            // MultipartBody.Part is used to send also the actual file name
+            //pDocNid,pDocForm,pDocTin,pDocCert,pDocSTMT,pDocBusinessCard
+            var fileName: String = ""
+            if (index == 0) {
+                fileName = "pDocNid"
+            } else if (index == 1) {
+                fileName = "pDocForm"
+            } else if (index == 2) {
+                fileName = "pDocTin"
+            } else if (index == 3) {
+                fileName = "pDocCert"
+            } else if (index == 4) {
+                fileName = "pDocSTMT"
+            } else if (index == 5) {
+                fileName = "pDocBusinessCard"
+            }
+
+            index += 1
+
+            val body =
+                MultipartBody.Part.createFormData(fileName, file.name, requestFile)
+            parts.add(body)
+
+
+        }
+
+
+        // add another part within the multipart request
+        val descriptionString = "" + globalVeriable.id + "=" + reqid
+        val description = RequestBody.create(
+            MultipartBody.FORM, descriptionString
+        )
+
+        var model = MessageRequestM()
+        //model.parts = parts
+        model.sender_id = globalVeriable.id
+        model.receiver_id = "1"
+        model.message = ""+edtMessage.text.toString()
+
+        this.let { it1 -> messageVM.doLoanReqDocUpload(model, it1) }
+    }
+
+    fun observeMessageImage(){
+        messageVM.lr_doc_upload_info.observe(this, androidx.lifecycle.Observer {
+
+            it?.let {
+
+                val model = MessageDataM(
+                    it.created_at,
+                    it.error,
+                    it.id,
+                    it.image,
+                    it.message,
+                    it.receiver_id,
+                    it.sender_id,
+                    it.updated_at
+                )
+            }
+        })
+    }
 }

@@ -79,4 +79,13 @@ class ApiService {
             model.sender_id
         )
     }
+
+    fun  doLrDocUpload(requestModel: MessageRequestM): Single<MessageDataM> {
+        return api.doLrDocUpload(
+            requestModel.sender_id,
+            requestModel.receiver_id,
+            requestModel.message
+           // requestModel.parts
+        )
+    }
 }

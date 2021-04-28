@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         initialization()
 
         JWTUtils.decoded(jwtString)
-        Toast.makeText(this,JWTUtils.decoded(jwtString).toString(),Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this,JWTUtils.decoded(jwtString).toString(),Toast.LENGTH_SHORT).show()
 
         setSupportActionBar(toolbar)
         supportActionBar?.title = "GARDIAN"
