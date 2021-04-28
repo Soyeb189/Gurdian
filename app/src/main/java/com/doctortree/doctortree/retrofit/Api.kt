@@ -57,5 +57,15 @@ interface Api {
         @Part photo : MultipartBody.Part?
     ): Single<MessageDataM>
 
+    // @Multipart
+    @FormUrlEncoded
+    @POST("message")
+    fun doLrDocUploadWithoutImage(
+        @Field("sender_id") sender_id: String?,
+        @Field("receiver_id") receiver_id: String?,
+        @Field("message") message: String?,
+        // @Part image: List<MultipartBody.Part?>?
+    ): Single<MessageDataM>
+
 
 }

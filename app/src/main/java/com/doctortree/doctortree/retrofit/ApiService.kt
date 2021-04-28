@@ -6,7 +6,6 @@ import com.doctortree.doctortree.util.Constrants_Variable
 import com.google.gson.GsonBuilder
 import io.reactivex.Single
 import okhttp3.OkHttpClient
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -86,6 +85,14 @@ class ApiService {
             requestModel.receiver_id,
             requestModel.message,
             requestModel.body,
+        )
+    }
+
+    fun  doLrDocUploadWithoutImage(model: MessageRequestWithoutImageM): Single<MessageDataM> {
+        return api.doLrDocUploadWithoutImage(
+            model.sender_id,
+            model.receiver_id,
+            model.message
         )
     }
 }

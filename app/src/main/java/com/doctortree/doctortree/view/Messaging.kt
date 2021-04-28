@@ -28,6 +28,7 @@ import com.doctortree.doctortree.data.MessageDataM
 import com.doctortree.doctortree.data.MessageListDataM
 import com.doctortree.doctortree.request.MessageListRequestM
 import com.doctortree.doctortree.request.MessageRequestM
+import com.doctortree.doctortree.request.MessageRequestWithoutImageM
 import com.doctortree.doctortree.util.Custom_alert
 import com.doctortree.doctortree.util.Custom_alert.showSuccessMessage
 import com.doctortree.doctortree.util.FileSizeRestriction
@@ -35,6 +36,7 @@ import com.doctortree.doctortree.util.GlobalVeriable
 import com.doctortree.doctortree.util.ImageUtil
 import com.doctortree.doctortree.viewModel.MessageListViewM
 import com.doctortree.doctortree.viewModel.MessageVM
+import com.doctortree.doctortree.viewModel.MessageWithoutImageVM
 import droidninja.filepicker.FilePickerBuilder
 import droidninja.filepicker.FilePickerConst
 import droidninja.filepicker.utils.ContentUriUtils
@@ -90,6 +92,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     private lateinit var messageVM: MessageVM
 
+    private lateinit var messageWithoutImageVM: MessageWithoutImageVM
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messaging)
@@ -105,13 +109,19 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
 
         sendImage.setOnClickListener {
-            updateDocuments("1")
+            if (imagePath.isNullOrEmpty()){
+                sentMessage()
+            }else{
+                updateDocuments("1")
+            }
+
         }
 
         getMessage()
         // observeMessage()
         observeViewModel()
         observeMessageImage()
+        observeMessageImageWithoutImage()
     }
 
 
@@ -339,6 +349,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                             // specify an viewAdapter (see also next example)
                             adapter = viewAdapter
 
+                            recyclerView.scrollToPosition(messageList.size - 1)
+
 
 
                         }
@@ -365,12 +377,55 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         messageVM = ViewModelProvider(this).get(MessageVM::class.java)
 
+        messageWithoutImageVM = ViewModelProvider(this).get(MessageWithoutImageVM::class.java)
+
         recyclerView = findViewById<RecyclerView>(R.id.rvMessage)
 
         /************ Alert Dialog **********/
         pDialog = Custom_alert.showProgressDialog(this)
 
     }
+
+    //**************** Message Without Image *********************//
+
+    private fun sentMessage() {
+        val model = MessageRequestWithoutImageM()
+        model.sender_id = globalVeriable.id
+        model.receiver_id = "1"
+        model.message = ""+edtMessage.text.toString()
+
+        this.let { it1 -> messageWithoutImageVM.doMessage(model,it1) }
+
+
+        pDialog.show()
+
+
+    }
+
+    fun observeMessageImageWithoutImage(){
+        messageWithoutImageVM.message_info.observe(this, androidx.lifecycle.Observer {
+
+            it?.let {
+
+                val model = MessageDataM(
+                    it.created_at,
+                    it.error,
+                    it.id,
+                    it.image,
+                    it.message,
+                    it.receiver_id,
+                    it.sender_id,
+                    it.updated_at
+                )
+
+                getMessage()
+            }
+        })
+    }
+
+    //**************** Message Without Image *********************//
+
+
 
     //***************** Adapter Class start here *********************//
 
@@ -587,6 +642,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         var requestFile  = RequestBody.create(MultipartBody.FORM, file);
         var body : MultipartBody.Part = MultipartBody.Part.createFormData("image", file.name, requestFile);
         model.body = body;
+        pDialog.show()
         this.let { it1 -> messageVM.doLoanReqDocUpload(model, it1) }
     }
 
@@ -594,6 +650,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         messageVM.lr_doc_upload_info.observe(this, androidx.lifecycle.Observer {
 
             it?.let {
+                pDialog.dismiss()
+                imagePath = ""
 
                 val model = MessageDataM(
                     it.created_at,
