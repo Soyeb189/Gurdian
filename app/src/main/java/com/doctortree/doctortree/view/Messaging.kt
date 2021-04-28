@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bd.ehaquesoft.sweetalert.SweetAlertDialog
 import com.bumptech.glide.Glide
 import com.doctortree.doctortree.R
 import com.doctortree.doctortree.data.DiesesListDataM
@@ -37,6 +39,7 @@ import droidninja.filepicker.FilePickerBuilder
 import droidninja.filepicker.FilePickerConst
 import droidninja.filepicker.utils.ContentUriUtils
 import kotlinx.android.synthetic.main.activity_messaging.*
+import kotlinx.android.synthetic.main.choose_upload_type_view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -56,6 +59,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     private val MAX_ATTACHMENT_COUNT = 1
     private var photoPaths = java.util.ArrayList<Uri>()
     private var docPaths = java.util.ArrayList<Uri>()
+    private var imagePath : String? = "";
 
     private var filePaths =
         java.util.ArrayList<Uri>()
@@ -77,6 +81,9 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     //********** Buttons *****************//
     private lateinit var btnMessageImage : ImageView
+
+    //*********** Sweet Alert *********//
+    private lateinit var pDialog: SweetAlertDialog
 
     var choose:Int = 0
     var pDocNid:Int = 0
@@ -102,7 +109,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
 
         getMessage()
-       // observeMessage()
+        // observeMessage()
         observeViewModel()
         observeMessageImage()
     }
@@ -189,6 +196,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                 if (dataList != null) {
                     photoPaths = java.util.ArrayList()
                     photoPaths.add(dataList[0])
+
+
                     try {
                         //singleFileUpload(dataList.get(0));
                         //multipleFileUpload(dataList)
@@ -198,7 +207,11 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                                 dataList[0]))
                         if (res) {
                             files[choose] = dataList[0]
+                            imagePath = ""+ ContentUriUtils.getFilePath(this, dataList[0])
                             setImage(dataList[0])
+
+                            recyclerView.visibility = View.GONE
+                            imageMsg.visibility = View.VISIBLE
 
                             Log.e("onActivityResult", "" + files[choose])
                             Log.e("onActivityResultSize", "" + files.size.toString())
@@ -252,6 +265,12 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         model.sender_id = ""+globalVeriable.id
 
         this.let { it1 -> messageListViewM.getMessageList(model,it1) }
+        recyclerView.visibility = View.VISIBLE
+        imageMsg.visibility = View.GONE
+
+        pDialog.show()
+
+
     }
 
     fun observeViewModel() {
@@ -261,6 +280,9 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             androidx.lifecycle.Observer {
 
                 it?.let {
+
+                    pDialog.dismiss()
+                    edtMessage.setText("")
 
                     if (null != it) {
                         messageList.clear()
@@ -330,72 +352,6 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     }
 
-    private fun observeMessage() {
-        messageListViewM.messageList.observe(
-            this,{
-
-                it?.let {
-                    try {
-                        messageList.clear()
-                    }catch (e:Exception){
-
-                    }
-
-                    messageList = ArrayList<MessageListDataM>()
-
-                    for (i in 0 until it.size) {
-                        val model = MessageListDataM(
-                            it.get(i).created_at.toString(),
-                            it.get(i).error,
-                            it.get(i).id,
-                            it.get(i).image,
-                            it.get(i).message,
-                            it.get(i).receiver_id,
-                            it.get(i).receiver_name,
-                            it.get(i).sender_id,
-                            it.get(i).sender_name
-                        )
-
-                        messageList.add(model)
-                        Log.e("MSize", messageList.size.toString())
-
-                    }
-
-                        viewManager = LinearLayoutManager(this)
-                        viewAdapter =
-                            MessageListAdapter(
-                                messageList,
-                                this,
-                                object :
-                                    MessageListAdapter.OnItemClickListener {
-                                    override fun onItemClick(item: MessageListDataM?) {
-
-                                    }
-                                })
-
-                        recyclerView = findViewById<RecyclerView>(R.id.rvMessage).apply {
-                            // use this setting to improve performance if you know that changes
-                            // in content do not change the layout size of the RecyclerView
-                            setHasFixedSize(true)
-
-                            viewManager.isAutoMeasureEnabled = false;
-
-                            // use a linear layout manager
-                            layoutManager = GridLayoutManager(this@Messaging,1)
-
-                            //recyclerView.layoutManager = GridLayoutManager(this@Dieses, 2)
-
-                            // specify an viewAdapter (see also next example)
-                            adapter = viewAdapter
-
-                        }
-
-                    }
-
-
-            })
-    }
-
 
 
     private fun initialization() {
@@ -408,6 +364,11 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         btnMessageImage = findViewById(R.id.btnMessageImage)
 
         messageVM = ViewModelProvider(this).get(MessageVM::class.java)
+
+        recyclerView = findViewById<RecyclerView>(R.id.rvMessage)
+
+        /************ Alert Dialog **********/
+        pDialog = Custom_alert.showProgressDialog(this)
 
     }
 
@@ -450,16 +411,16 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         ) {
             val messageList = messageListFilter[position]
 
-//            if (messageList.image==null){
-//                holder.image_card.visibility = View.GONE
-//            }else if ( messageList.image!!.isEmpty()){
-//                holder.image_card.visibility = View.GONE
-//            }else{
-//                holder.image_card.visibility = View.VISIBLE
-//                Glide.with(context)
-//                    .load(messageList.image)
-//                    .into(holder.message_img)
-//            }
+            if (messageList.image==null){
+                holder.image_card.visibility = View.GONE
+            }else if ( messageList.image!!.isEmpty()){
+                holder.image_card.visibility = View.GONE
+            }else{
+                holder.image_card.visibility = View.VISIBLE
+                Glide.with(context)
+                    .load(messageList.image)
+                    .into(holder.message_img)
+            }
 
             if (messageList.message == null && messageList.image == null){
                 holder.message_card.visibility = View.GONE
@@ -473,6 +434,12 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             }else if (messageList.image == null){
                 holder.message_card.visibility = View.VISIBLE
                 holder.message.text = messageList.message
+                if (messageList.sender_id == "1"){
+                    holder.tvName.text = "Admin"
+                }else{
+                    holder.tvName.text = messageList.sender_name
+                }
+
                 holder.image_card.visibility = View.GONE
             }
 
@@ -480,6 +447,11 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                 holder.message_card.visibility = View.VISIBLE
                 holder.message.visibility = View.VISIBLE
                 holder.message.text = messageList.message
+                if (messageList.sender_id == "1"){
+                    holder.tvName.text = "Admin"
+                }else{
+                    holder.tvName.text = messageList.sender_name
+                }
                 Glide.with(context)
                     .load(messageList.image)
                     .into(holder.message_img)
@@ -497,11 +469,13 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
             var message_img: ImageView
             var message: TextView
+            var tvName: TextView
             var image_card: CardView
             var message_card : CardView
             init {
                 message_img = itemView.findViewById(R.id.imgMessage)
                 message = itemView.findViewById(R.id.tvMessage)
+                tvName = itemView.findViewById(R.id.tvName)
                 image_card = itemView.findViewById(R.id.imageCard)
                 message_card = itemView.findViewById(R.id.messageCard)
 
@@ -564,7 +538,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         for (uri in photoPaths) {
             val path = ContentUriUtils.getFilePath(this, uri!!)
-            Log.e("Upload", "Path: " + path)
+            Log.e("Upload-----------", "Path: " + path)
             val file = File(path)
 
             // create RequestBody instance from file
@@ -595,10 +569,7 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             val body =
                 MultipartBody.Part.createFormData(fileName, file.name, requestFile)
             parts.add(body)
-
-
         }
-
 
         // add another part within the multipart request
         val descriptionString = "" + globalVeriable.id + "=" + reqid
@@ -608,10 +579,14 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         var model = MessageRequestM()
         //model.parts = parts
-        model.sender_id = globalVeriable.id
-        model.receiver_id = "1"
-        model.message = ""+edtMessage.text.toString()
-
+        model.sender_id = RequestBody.create(MediaType.parse("text/plain"), globalVeriable.id);
+        model.receiver_id = RequestBody.create(MediaType.parse("text/plain"), "1");
+        model.message = RequestBody.create(MediaType.parse("text/plain"),  ""+edtMessage.text.toString());
+        //var file : File = File(photoPaths[0].path);
+        var file : File = File(imagePath)
+        var requestFile  = RequestBody.create(MultipartBody.FORM, file);
+        var body : MultipartBody.Part = MultipartBody.Part.createFormData("image", file.name, requestFile);
+        model.body = body;
         this.let { it1 -> messageVM.doLoanReqDocUpload(model, it1) }
     }
 
@@ -630,6 +605,8 @@ class Messaging : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                     it.sender_id,
                     it.updated_at
                 )
+
+                getMessage()
             }
         })
     }

@@ -84,8 +84,8 @@ class ApiService {
         return api.doLrDocUpload(
             requestModel.sender_id,
             requestModel.receiver_id,
-            requestModel.message
-           // requestModel.parts
+            requestModel.message,
+            requestModel.body,
         )
     }
 }

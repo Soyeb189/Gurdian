@@ -111,7 +111,7 @@ class Login : AppCompatActivity() {
                         if (model.error?.equals(false)!!){
 
                             SweetAlertDialog(this,SweetAlertDialog.SUCCESS_TYPE)
-                                .setTitleText("লগিন সম্পূর্ণ হয়েছে")
+                                .setTitleText("লগইন সম্পূর্ণ হয়েছে")
                                 .setConfirmText("ওকে")
                                 .setConfirmClickListener {
                                     val intent = Intent(this, MainActivity::class.java)

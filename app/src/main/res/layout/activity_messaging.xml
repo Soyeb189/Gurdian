@@ -15,12 +15,15 @@
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         android:background="#558B2F"/>
     <ImageView
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:layout_below="@+id/toolbar"
         android:id="@+id/imageMsg"
-        android:layout_width="250dp"
-        android:layout_height="250dp"/>
+        android:layout_width="300dp"
+        android:layout_height="300dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginStart="10dp"
         android:layout_below="@+id/imageMsg"
         android:id="@+id/rvMessage"
         android:layout_above="@+id/footerV"
@@ -43,21 +46,22 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-      <EditText
-          android:id="@+id/edtMessage"
-          android:layout_marginStart="10dp"
-          android:layout_width="0dp"
-          android:layout_weight="1"
-          android:layout_height="wrap_content"
-          android:hint="Type your query here"
-          android:background="@drawable/edit_text_background"/>
+        <EditText
+            android:id="@+id/edtMessage"
+            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Type your query here"
+            android:background="@drawable/edit_text_background"/>
+
         <ImageView
             android:id="@+id/sendImage"
-            android:layout_marginStart="10dp"
-            android:src="@drawable/send_arrow"
-            android:layout_weight=".1"
             android:layout_width="25dp"
-            android:layout_height="40dp"/>
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_weight=".1"
+            android:src="@drawable/send_arrow" />
         <ImageView
             android:id="@+id/btnMessageImage"
             android:src="@drawable/image_gallery"
